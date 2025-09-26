@@ -10,19 +10,26 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
         go-version: '1.24.5'
 
-    - name: Build
-      run: go build -v ./...
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      # You can test your matrix by printing the current Go version
+      - name: Display Go version
+        run: go version
 
-    - name: Test
-      run: go test -v ./...
+      - name: Install dependencies
+        run: go get cth.release/go-rds/web
+      
+      - name: Build
+        run: go build -v ./...
+        
